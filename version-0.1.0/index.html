@@ -42,8 +42,11 @@ def get_problem_numbers(stier, etier, max_pages=10):
     driver = webdriver.Chrome()
     driver.implicitly_wait(3)
     problems = []
-
-    for page in range(1, max_pages+1):
+    page=1
+    while 1:
+        if max_pages!='inf':
+            if page>max_pages:
+                break
         url = get_jungol_url(stier, etier, page)
         driver.get(url)
 
@@ -57,12 +60,12 @@ def get_problem_numbers(stier, etier, max_pages=10):
                 num = href.split("/")[-1]
                 if num.isdigit():
                     problems.append(int(num))
-
+        page+=1
     driver.quit()
     return problems
 
-def pick_random_problem(stier, etier):
-    problems = get_problem_numbers(stier, etier)
+def pick_random_problem(stier, etier, mpg):
+    problems = get_problem_numbers(stier, etier,mpg)
     if not problems:
         raise ValueError("해당 티어 범위에서 문제를 찾을 수 없습니다.")
     return random.choice(problems)
@@ -72,7 +75,7 @@ def run_random():
     stier = start_tier.get()
     etier = end_tier.get()
     try:
-        problem_number = pick_random_problem(stier, etier)
+        problem_number = pick_random_problem(stier, etier,'inf')
         link = f"https://jungol.co.kr/problem/{problem_number}"
         messagebox.showinfo("랜덤 문제 결과", f"뽑힌 문제 번호: {problem_number}\n링크: {link}")
         if messagebox.askyesno('갈까?','그 링크를 줄까요?(복사)'):
