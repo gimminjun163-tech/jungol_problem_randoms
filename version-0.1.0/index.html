@@ -1,3 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <title>JPRM-v0.1.0</title>
+    <body>
+<!-- highlight.js CSS (테마 선택 가능) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/rainbow.css">
+
+<!-- highlight.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+<!-- 코드 블록 -->
+<div style="position: relative;">
+  <pre><code class="language-python">
 import tkinter as tk
 from tkinter import ttk, messagebox
 from selenium import webdriver
@@ -81,3 +95,24 @@ end_tier.pack(pady=5)
 tk.Button(root, text="랜덤 문제 뽑기", command=run_random).pack(pady=20)
 
 root.mainloop()
+  </code></pre>
+
+  <!-- 복사 버튼 -->
+  <button onclick="copyCode(this)" 
+          style="position:absolute; top:5px; right:5px; padding:5px 10px; cursor:pointer;">
+    Copy
+  </button>
+</div>
+
+<script>
+function copyCode(button) {
+  const codeBlock = button.parentElement.querySelector('code');
+  const text = codeBlock.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    button.innerText = "Copied!";
+    setTimeout(() => button.innerText = "Copy", 2000);
+  });
+}
+</script>
+    </body>
+</html>
