@@ -1,0 +1,83 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import random
+
+# 티어 매핑
+tier_mapping = {
+    'Bronze 5': 1, 'Bronze 4': 2, 'Bronze 3': 3, 'Bronze 2': 4, 'Bronze 1': 5,
+    'Silver 5': 6, 'Silver 4': 7, 'Silver 3': 8, 'Silver 2': 9, 'Silver 1': 10,
+    'Gold 5': 11, 'Gold 4': 12, 'Gold 3': 13, 'Gold 2': 14, 'Gold 1': 15,
+    'Platinum 5': 16, 'Platinum 4': 17, 'Platinum 3': 18, 'Platinum 2': 19, 'Platinum 1': 20,
+    'Diamond 5': 21, 'Diamond 4': 22, 'Diamond 3': 23, 'Diamond 2': 24, 'Diamond 1': 25,
+    'Ruby 5': 26, 'Ruby 4': 27, 'Ruby 3': 28, 'Ruby 2': 29, 'Ruby 1': 30
+}
+
+tiers = list(tier_mapping.keys())
+
+def tier_to_number(tier: str) -> int:
+    return tier_mapping.get(tier, 0)
+
+def get_jungol_url(stier, etier, page=1):
+    sbun = tier_to_number(stier)
+    ebun = tier_to_number(etier)
+    return f"https://jungol.co.kr/problem?minTier={sbun}&maxTier={ebun}&page={page}"
+
+def get_problem_numbers(stier, etier, max_pages=10):
+    driver = webdriver.Chrome()
+    driver.implicitly_wait(3)
+    problems = []
+
+    for page in range(1, max_pages+1):
+        url = get_jungol_url(stier, etier, page)
+        driver.get(url)
+
+        links = driver.find_elements(By.CSS_SELECTOR, "a[href^='/problem/']")
+        if not links:
+            break
+
+        for link in links:
+            href = link.get_attribute("href")
+            if href and href.startswith("https://jungol.co.kr/problem/"):
+                num = href.split("/")[-1]
+                if num.isdigit():
+                    problems.append(int(num))
+
+    driver.quit()
+    return problems
+
+def pick_random_problem(stier, etier):
+    problems = get_problem_numbers(stier, etier)
+    if not problems:
+        raise ValueError("해당 티어 범위에서 문제를 찾을 수 없습니다.")
+    return random.choice(problems)
+
+# Tkinter GUI
+def run_random():
+    stier = start_tier.get()
+    etier = end_tier.get()
+    try:
+        problem_number = pick_random_problem(stier, etier)
+        link = f"https://jungol.co.kr/problem/{problem_number}"
+        messagebox.showinfo("랜덤 문제 결과", f"뽑힌 문제 번호: {problem_number}\n링크: {link}")
+        messagebox.askyesno('t')
+    except Exception as e:
+        messagebox.showerror("오류", str(e))
+
+root = tk.Tk()
+root.title("정올 랜덤 문제 추출기")
+
+tk.Label(root, text="시작 티어 선택").pack(pady=5)
+start_tier = ttk.Combobox(root, values=tiers)
+start_tier.current(0)
+start_tier.pack(pady=5)
+
+tk.Label(root, text="끝 티어 선택").pack(pady=5)
+end_tier = ttk.Combobox(root, values=tiers)
+end_tier.current(len(tiers)-1)
+end_tier.pack(pady=5)
+
+tk.Button(root, text="랜덤 문제 뽑기", command=run_random).pack(pady=20)
+
+root.mainloop()
