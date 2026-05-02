@@ -49,12 +49,12 @@ def get_problem_numbers(stier, etier, max_pages=10):
                 break
         url = get_jungol_url(stier, etier, page)
         driver.get(url)
-        if int(driver.current_url.split('=')[-1])!=page:
-            break
+
         links = driver.find_elements(By.CSS_SELECTOR, "a[href^='/problem/']")
         if not links:
             break
-
+        if int(driver.current_url.split('=')[-1])!=page:
+            break
         for link in links:
             href = link.get_attribute("href")
             if href and href.startswith("https://jungol.co.kr/problem/"):
@@ -100,6 +100,7 @@ end_tier.pack(pady=5)
 tk.Button(root, text="랜덤 문제 뽑기", command=run_random).pack(pady=20)
 
 root.mainloop()
+
 
   </code></pre>
 
